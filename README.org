@@ -5,29 +5,23 @@
 This repository contains my personal configuration files (dotfiles).
 They are organized so that I can easily manage them across multiple machines using [[https://www.gnu.org/software/stow/][GNU Stow]].
 
-** Installation
-1. Clone this repository into your home directory (or wherever you prefer):
-   #+begin_src bash
-   git clone git@github.com:Exotica0122/dotfiles.git ~/https://github.com/Exotica0122/dotfiles.git
-   cd ~/https://github.com/Exotica0122/dotfiles.git
-   #+end_src
+** Clone this repository into your home directory (or wherever you prefer):
+#+begin_src bash
+git clone git@github.com:Exotica0122/dotfiles.git ~/github.com/Exotica0122/dotfiles.git
+cd ~/github.com/Exotica0122/dotfiles.git
+#+end_src
 
-2. Install GNU Stow (if not already installed):
-   - macOS (Homebrew): ~brew install stow~
-   - Linux (Debian/Ubuntu): ~sudo apt install stow~
-   - Linux (Fedora): ~sudo dnf install stow~
+** Install GNU Stow (if not already installed):
+- macOS (Homebrew): ~brew install stow~
+- Linux (Debian/Ubuntu): ~sudo apt install stow~
+- Linux (Fedora): ~sudo dnf install stow~
 
 ** Usage
 To symlink a config, run stow from inside the repo:
 
-- Symlink Zsh config:
-  #+begin_src shell
-  stow zsh
-  #+end_src
-
-- Symlink Ghostty config:
-  #+begin_src shell
-  stow ghostty
-  #+end_src
+*** Symlink configs:
+#+begin_src bash
+find . -mindepth 1 -maxdepth 1 -type d ! -name ".git" -exec basename {} \; | xargs stow -Rv --no-folding --target=$HOME
+#+end_src
 
 This will create symlinks in your home directory that point to the files in this repository.
