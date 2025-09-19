@@ -45,7 +45,10 @@ export GOROOT="$(brew --prefix golang)/libexec"
 export PATH=$PATH:$GOPATH/bin
 export PATH=$PATH:$GOROOT/bin
 
+# Vim stuff
 alias vim=nvim
+export VISUAL="nvim"
+export EDITOR=$VISUAL
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
