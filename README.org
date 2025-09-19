@@ -25,3 +25,11 @@ find . -mindepth 1 -maxdepth 1 -type d ! -name ".git" -exec basename {} \; | xar
 #+end_src
 
 This will create symlinks in your home directory that point to the files in this repository.
+
+*** Brew packages
+**** Pre-requisite
+Please install [[https://brew.sh/][brew]]
+**** Download dependencies
+#+begin_src bash
+brew bundle --file=Brewfile
+#+end_src
