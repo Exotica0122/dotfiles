@@ -8,6 +8,9 @@ export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_STATE_HOME="$HOME/.local/state"
 
+# brew
+export PATH=$PATH:/opt/homebrew/bin
+
 # fnm
 export PATH="/Users/peteran/Library/Application Support/fnm:$PATH"
 
