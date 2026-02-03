@@ -1,31 +1,28 @@
 -- load defaults i.e lua_lsp
 require("nvchad.configs.lspconfig").defaults()
 
-local lspconfig = require "lspconfig"
+local nvlsp = require("nvchad.configs.lspconfig")
+local servers = { "html", "cssls", "ts_ls", "tailwindcss", "eslint", "intelephense" }
+local on_attach = nvlsp.on_attach
+local capabilities = nvlsp.capabilities
 
--- EXAMPLE
-local servers = { "html", "cssls", "ts_ls", "tailwindcss", "eslint", "cssls", "intelephense" }
-local nvlsp = require "nvchad.configs.lspconfig"
-
-local on_attach = require("nvchad.configs.lspconfig").on_attach
-local capabilities = require("nvchad.configs.lspconfig").capabilities
-local util = require "lspconfig/util"
-
--- lsps with default config
 for _, lsp in ipairs(servers) do
-  lspconfig[lsp].setup {
+  vim.lsp.config(lsp, {
     on_attach = nvlsp.on_attach,
     on_init = nvlsp.on_init,
     capabilities = nvlsp.capabilities,
-  }
+  })
+  vim.lsp.enable(lsp)
 end
 
-lspconfig.gopls.setup {
+vim.lsp.config("gopls", {
   on_attach = on_attach,
   capabilities = capabilities,
   cmd = { "gopls" },
   filetypes = { "go", "gomod", "gowork", "gotmpl" },
-  root_dir = util.root_pattern("go.work", "go.mod", ".git"),
+  root_dir = function(bufnr, on_dir)
+    on_dir(vim.fs.root(bufnr, { "go.work", "go.mod", ".git" }))
+  end,
   settings = {
     gopls = {
       completeUnimported = true,
@@ -35,21 +32,20 @@ lspconfig.gopls.setup {
       },
     },
   },
-}
+})
+vim.lsp.enable("gopls")
 
-lspconfig.elixirls.setup {
+vim.lsp.config("elixirls", {
   cmd = { "/Users/peteran/.languages/elixir-ls/language_server.sh" },
-}
+})
+vim.lsp.enable("elixirls")
 
-local python_servers = {
-  "pyright",
-  "ruff",
-}
-
+local python_servers = { "pyright", "ruff" }
 for _, lsp in ipairs(python_servers) do
-  lspconfig[lsp].setup {
+  vim.lsp.config(lsp, {
     on_attach = on_attach,
     capabilities = capabilities,
     filetypes = { "python" },
-  }
+  })
+  vim.lsp.enable(lsp)
 end
