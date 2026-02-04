@@ -8,52 +8,48 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-# eval "`fnm env`"
-eval "$(fnm env --use-on-cd)"
+# Platform
+_is_macos() { [[ "$(uname)" == Darwin ]]; }
+_is_linux() { [[ "$(uname)" == Linux ]]; }
 
-# bun completions
-[ -s "/Users/peteran/.bun/_bun" ] && source "/Users/peteran/.bun/_bun"
-
-#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
-[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+# fnm
+eval "$(fnm env --use-on-cd 2>/dev/null)" || true
 
 alias p='docker compose exec php /app/docker/development/entrypoint.sh'
-
-. "$HOME/.cargo/env"            # For sh/bash/zsh/ash/dash/pdksh
 
 # Vim stuff
 alias vim=nvim
 
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/opt/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "/opt/anaconda3/etc/profile.d/conda.sh" ]; then
-        . "/opt/anaconda3/etc/profile.d/conda.sh"
-    else
-        export PATH="/opt/anaconda3/bin:$PATH"
-    fi
-fi
-unset __conda_setup
-# <<< conda initialize <<<
-
-# pnpm
+# pnpm (PNPM_HOME set in .zshenv)
 case ":$PATH:" in
   *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
+  *) [[ -n "$PNPM_HOME" ]] && export PATH="$PNPM_HOME:$PATH" ;;
 esac
-# pnpm end
 
-export AWS_DEFAULT_PROFILE=ezyVetexport PATH="/opt/homebrew/opt/llvm/bin:$PATH"
+# Homebrew prefix (macOS or Linux Homebrew)
+_brew_prefix="${HOMEBREW_PREFIX:-$(brew --prefix 2>/dev/null)}"
 
 autoload -U +X bashcompinit && bashcompinit
-complete -o nospace -C /opt/homebrew/bin/terraform terraform
+# Terraform completion: Homebrew or Arch (pacman)
+if [[ -n "$_brew_prefix" && -x "$_brew_prefix/bin/terraform" ]]; then
+  complete -o nospace -C "$_brew_prefix/bin/terraform" terraform
+elif _is_linux && command -v terraform &>/dev/null; then
+  complete -o nospace -C terraform terraform
+fi
 
-source $(brew --prefix)/opt/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
+# zsh-vi-mode: Homebrew or Arch (e.g. AUR zsh-vi-mode)
+if [[ -n "$_brew_prefix" && -f "$_brew_prefix/opt/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh" ]]; then
+  source "$_brew_prefix/opt/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh"
+elif _is_linux && [[ -f /usr/share/zsh/plugins/zsh-vi-mode/zsh-vi-mode.plugin.zsh ]]; then
+  source /usr/share/zsh/plugins/zsh-vi-mode/zsh-vi-mode.plugin.zsh
+fi
 
-source /opt/homebrew/share/powerlevel10k/powerlevel10k.zsh-theme
+# Powerlevel10k: Homebrew or Arch (zsh-theme-powerlevel10k)
+if [[ -n "$_brew_prefix" && -f "$_brew_prefix/share/powerlevel10k/powerlevel10k.zsh-theme" ]]; then
+  source "$_brew_prefix/share/powerlevel10k/powerlevel10k.zsh-theme"
+elif _is_linux && [[ -f /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme ]]; then
+  source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
+fi
 
 # history setup
 HISTFILE=$HOME/.zhistory
@@ -68,21 +64,31 @@ setopt hist_verify
 bindkey '^[[A' history-search-backward
 bindkey '^[[B' history-search-forward
 
-source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+# zsh-autosuggestions: Homebrew or Arch
+if [[ -n "$_brew_prefix" && -f "$_brew_prefix/share/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
+  source "$_brew_prefix/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+elif _is_linux && [[ -f /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
+  source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+fi
 
-source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+# zsh-syntax-highlighting: Homebrew or Arch
+if [[ -n "$_brew_prefix" && -f "$_brew_prefix/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
+  source "$_brew_prefix/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+elif _is_linux && [[ -f /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
+  source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+fi
 
 # ---- Eza (better ls) -----
-
 alias ls="eza --icons=always"
 
 # ---- Zoxide (better cd) ----
-eval "$(zoxide init zsh)"
-
+eval "$(zoxide init zsh 2>/dev/null)" || true
 alias cd="z"
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+# p10k config
+[[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
 
-alias love="/Applications/love.app/Contents/MacOS/love"
-
+# LÖVE game framework: macOS app path vs Linux (love in PATH)
+if _is_macos && [[ -x /Applications/love.app/Contents/MacOS/love ]]; then
+  alias love="/Applications/love.app/Contents/MacOS/love"
+fi
