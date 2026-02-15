@@ -22,9 +22,6 @@ fi
 _is_macos() { [[ "$(uname)" == Darwin ]]; }
 _is_linux() { [[ "$(uname)" == Linux ]]; }
 
-# fnm
-eval "$(fnm env --use-on-cd 2>/dev/null)" || true
-
 alias p='docker compose exec php /app/docker/development/entrypoint.sh'
 
 # Vim stuff
@@ -102,3 +99,6 @@ alias cd="z"
 if _is_macos && [[ -x /Applications/love.app/Contents/MacOS/love ]]; then
   alias love="/Applications/love.app/Contents/MacOS/love"
 fi
+
+# opencode
+alias c="opencode"
