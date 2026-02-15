@@ -24,6 +24,8 @@ else
   export PATH="$HOME/.local/share/fnm:$PATH"
 fi
 
+export FNM_DIR="$HOME/.fnm"
+
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"

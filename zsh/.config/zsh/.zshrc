@@ -1,6 +1,16 @@
 autoload -Uz compinit
 compinit
 
+# fnm
+export PATH="$HOME/.fnm:$PATH"
+# if [ -d "$FNM_PATH" ]; then
+#   export PATH="$FNM_PATH:$PATH"
+#   eval "`fnm env`"
+# fi
+
+eval "$(fnm env --use-on-cd --shell zsh)"
+[[ -f .nvmrc ]] && fnm use
+
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
