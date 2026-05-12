@@ -1,0 +1,7 @@
+{
+  "enabledPlugins": {
+    "gopls-lsp@claude-plugins-official": true
+  },
+  "theme": "auto",
+  "skipAutoPermissionPrompt": true
+}
