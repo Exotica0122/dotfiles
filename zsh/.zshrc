@@ -106,3 +106,4 @@ fi
 export PATH=/Users/peteran/.opencode/bin:$PATH
 alias c="opencode"
 
+export PATH="$HOME/.local/bin:$PATH"
