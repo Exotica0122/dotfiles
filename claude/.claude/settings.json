@@ -4,9 +4,10 @@
     "command": "~/.claude/statusline.sh"
   },
   "enabledPlugins": {
-    "gopls-lsp@claude-plugins-official": true
+    "gopls-lsp@claude-plugins-official": true,
+    "skill-creator@claude-plugins-official": true
   },
+  "tui": "fullscreen",
   "theme": "auto",
-  "skipAutoPermissionPrompt": true,
-  "tui": "fullscreen"
+  "skipAutoPermissionPrompt": true
 }
