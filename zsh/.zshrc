@@ -107,3 +107,8 @@ export PATH=/Users/peteran/.opencode/bin:$PATH
 alias c="opencode"
 
 export PATH="$HOME/.local/bin:$PATH"
+
+# ---- Claude Code: keep the mac awake for the whole session ----
+if _is_macos; then
+  claude() { caffeinate -ims command claude "$@"; }
+fi
