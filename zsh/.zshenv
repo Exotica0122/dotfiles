@@ -63,3 +63,4 @@ fi
 export PATH="$PNPM_HOME:$PATH"
 
 export PATH="$PATH:$HOME/.config/emacs/bin/doom"
+. "$HOME/.cargo/env"
