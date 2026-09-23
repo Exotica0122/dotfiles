@@ -1,0 +1,11 @@
+#!/bin/sh
+# Pick a project out of zoxide's history and attach a session named after it,
+# creating it if it isn't running yet.
+set -u
+
+dir=$(zoxide query -l | fzf --reverse --prompt='project> ') || exit 0
+[ -n "$dir" ] || exit 0
+
+name=$(basename "$dir" | tr '. ' '__')
+tmux has-session -t "=$name" 2>/dev/null || tmux new-session -ds "$name" -c "$dir"
+tmux switch-client -t "=$name"
