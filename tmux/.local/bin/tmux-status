@@ -1,0 +1,42 @@
+#!/bin/sh
+# Right-hand status line. Runs every status-interval in every attached client,
+# so every command here stays cheap — no top(1)/iostat sampling.
+set -u
+
+dir=${1:-$HOME}
+sep="#[fg=white]│#[default]"
+
+branch=$(cd "$dir" 2>/dev/null && git branch --show-current 2>/dev/null)
+
+# Load average is a share of the cores, not a sampled percentage, so it can
+# exceed 100 when work is queued.
+set -- $(sysctl -n vm.loadavg)
+cpu=$(awk -v l="$2" -v c="$(sysctl -n hw.ncpu)" 'BEGIN { printf "%d", (l / c) * 100 }')
+if [ "$cpu" -ge 100 ]; then cpu_c=red
+elif [ "$cpu" -ge 60 ]; then cpu_c=yellow
+else cpu_c=green
+fi
+
+mem=$(memory_pressure 2>/dev/null | awk '/free percentage/ { gsub("%", "", $NF); print 100 - $NF }')
+if [ -z "$mem" ]; then mem=??; mem_c=white
+elif [ "$mem" -ge 90 ]; then mem_c=red
+elif [ "$mem" -ge 75 ]; then mem_c=yellow
+else mem_c=green
+fi
+
+pm=$(pmset -g batt 2>/dev/null)
+batt=$(printf '%s\n' "$pm" | awk 'NR == 2 { gsub("[%;]", "", $3); print $3 }')
+case $pm in
+  *"AC Power"*) ac="+" ;;
+  *) ac="" ;;
+esac
+if [ -z "$batt" ]; then batt=??; batt_c=white
+elif [ -n "$ac" ] || [ "$batt" -ge 40 ]; then batt_c=green
+elif [ "$batt" -ge 20 ]; then batt_c=yellow
+else batt_c=red
+fi
+
+[ -n "$branch" ] && printf '#[fg=cyan]%s#[default] %s ' "$branch" "$sep"
+printf '#[fg=%s]cpu %s%%#[default] %s ' "$cpu_c" "$cpu" "$sep"
+printf '#[fg=%s]mem %s%%#[default] %s ' "$mem_c" "$mem" "$sep"
+printf '#[fg=%s]bat %s%%%s#[default] %s ' "$batt_c" "$batt" "$ac" "$sep"
