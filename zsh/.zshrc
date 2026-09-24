@@ -92,7 +92,8 @@ alias ls="eza --icons=always"
 
 # ---- Zoxide (better cd) ----
 eval "$(zoxide init zsh 2>/dev/null)" || true
-alias cd="z"
+# Claude Code shell snapshots keep aliases but drop zoxide's chpwd hook
+[[ -z $CLAUDECODE ]] && alias cd="z"
 
 # p10k config
 [[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
