@@ -1,0 +1,11 @@
+#!/bin/sh
+# Hand a URL to the desktop's browser. macOS spells it open(1), everything else
+# xdg-open(1); tmux's url picker calls this so the binding is not macOS-only.
+set -u
+[ $# -gt 0 ] || exit 0
+if command -v xdg-open >/dev/null 2>&1; then exec xdg-open "$@"
+elif command -v open >/dev/null 2>&1; then exec open "$@"
+else
+  echo "open-url: no xdg-open or open on PATH" >&2
+  exit 1
+fi
