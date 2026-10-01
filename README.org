@@ -87,48 +87,48 @@ reads on macOS as well as Linux.
 Do *not* stow this package on an [[https://omarchy.org/][Omarchy]] machine: Omarchy ships its own
 ~~/.config/ghostty/config~ wired to the live theme, and this one would replace it.
 
-** hypr, waybar, swayosd — Omarchy only
-These three packages only apply to an [[https://omarchy.org/][Omarchy]] machine. Do *not* stow them on macOS,
-and expect Omarchy to own the paths alongside them.
+** hypr, omarchy — Omarchy only
+These two packages only apply to an [[https://omarchy.org/][Omarchy]] machine, version 4 or later, where
+Hyprland is configured in Lua and the bar, notifications, idle and lock all live in
+the Omarchy shell. Do *not* stow them on macOS, and expect Omarchy to own the paths
+alongside them.
 
-Only the hand-authored files are tracked. ~autostart.conf~, ~hyprsunset.conf~ and
-~xdph.conf~ are byte-identical to Omarchy's defaults, so they are left for Omarchy
-to create; ~walker/config.toml~ and ~fontconfig/fonts.conf~ likewise.
-~mako/config~ is deliberately absent — it is a symlink into
-~~/.config/omarchy/current/theme/~ and must stay one.
+Only the hand-authored files are tracked: ~bindings.lua~, ~input.lua~ and
+~monitors.lua~ under ~hypr~, and ~shell.json~ under ~omarchy~. ~hyprland.lua~,
+~looknfeel.lua~, ~autostart.lua~, ~hyprsunset.conf~ and ~xdph.conf~ are
+byte-identical to Omarchy's defaults, so they are left for Omarchy to create. Move
+one into the repo when it stops being stock.
 
 Omarchy creates every one of these files on install, and stow refuses a package
 when a target already exists, so remove the local copy before the first stow on a
 new machine:
 #+begin_src bash
-rm ~/.config/hypr/{bindings,envs,hypridle,hyprland,hyprlock,input,looknfeel,monitors}.conf
-rm ~/.config/waybar/{config.jsonc,style.css} ~/.config/swayosd/{config.toml,style.css}
-stow -Rv --no-folding --target=$HOME hypr waybar swayosd
+rm ~/.config/hypr/{bindings,input,monitors}.lua ~/.config/omarchy/shell.json
+stow -Rv --no-folding --target=$HOME hypr omarchy
 #+end_src
 
-Two things write *through* the symlinks, straight into this repo — which is mostly
-what you want, since the change then shows up in ~git diff~:
-- ~omarchy refresh <app>~ and update migrations ~cp~ their defaults over these paths.
-  A migration will happily reset ~hypridle.conf~ timeouts this way.
-- ~omarchy theme set~ rewrites the theme files it owns, which these only ~@import~.
+~omarchy refresh hyprland~ writes *through* the symlinks, straight into this repo: it
+~cp~-s the defaults over these paths, so the reset shows up in ~git diff~.
 
-One thing *breaks* the symlinks: ~omarchy font set~ runs plain ~sed -i~ (no
-~--follow-symlinks~) against ~hyprlock.conf~, ~waybar/style.css~ and
-~swayosd/style.css~, which replaces each symlink with a regular file and leaves the
-repo copy on the old font. Re-stow after changing the font:
+The Omarchy shell *breaks* the ~shell.json~ symlink. It saves atomically, so anything
+that changes the bar from the shell's side — ~omarchy bar ...~, the settings panel —
+replaces the link with a regular file and leaves the repo copy behind. Hand-editing
+the file is fine. After a shell-side change, adopt the new file and re-link it:
 #+begin_src bash
-omarchy font set "CaskaydiaMono Nerd Font"
-stow -Rv --no-folding --target=$HOME hypr waybar swayosd   # re-link what sed detached
+stow --adopt -Rv --no-folding --target=$HOME omarchy   # moves the live file into the repo
+git diff omarchy                                        # what the shell changed
 #+end_src
 
-~hypr/.config/hypr/envs.conf~ is the machine-specific file here: it carries the
-NVIDIA variables for a Turing+ card (an RTX 3060), and Omarchy's installer appends
-its own per-GPU block to that path. On a machine with different graphics, let
-Omarchy write it and skip ours (see ~--ignore~ above). Note also that nothing in
-Omarchy sources this file on its own — ~hyprland.conf~ has an explicit
-~source = ~/.config/hypr/envs.conf~ line for it.
+~monitors.lua~ is the machine-specific file here: it names both outputs and leaves out
+Omarchy's catch-all rule on purpose. ~omarchy hyprland monitor scaling~ persists into
+that rule with plain ~sed -i~, which would detach the symlink, and the per-output
+lines would override what it wrote anyway. On a machine with different displays, let
+Omarchy write the file and skip ours (see ~--ignore~ above).
 
-The desktop stack itself — hyprland, waybar, walker, mako, swayosd — is absent from
+Idle timeouts are the ~idle~ block of ~shell.json~, in seconds; the display blanks a
+few seconds after the lock engages, with no timeout of its own.
+
+The desktop stack itself — Hyprland and the Omarchy shell — is absent from
 ~Pkgfile.arch~ on purpose: Omarchy's own base install provides it.
 
 ** tmux
