@@ -1,0 +1,78 @@
+# Arch counterpart to the Brewfile. Same shape: one entry per line, `pkg` for the
+# official repos and `aur` for everything only packaged there.
+#
+#   pacman -S --needed $(sed -n 's/^pkg "\(.*\)"$/\1/p' Pkgfile.arch)
+#   yay    -S --needed $(sed -n 's/^aur "\(.*\)"$/\1/p' Pkgfile.arch)
+
+# shell
+pkg "zsh"
+pkg "stow"
+aur "zsh-theme-powerlevel10k"
+aur "zsh-vi-mode"
+pkg "zsh-autosuggestions"
+pkg "zsh-syntax-highlighting"
+
+# terminal + editor
+pkg "tmux"
+pkg "neovim"
+pkg "emacs"
+pkg "ghostty"
+pkg "ttf-jetbrains-mono-nerd"
+
+# cli
+pkg "bat"
+pkg "btop"
+pkg "curl"
+pkg "eza"
+pkg "fd"
+pkg "fzf"
+pkg "git-lfs"
+pkg "github-cli"
+pkg "gnupg"
+pkg "jq"
+pkg "lazygit"
+pkg "ripgrep"
+pkg "zoxide"
+# Brewfile's pinentry-mac; the generic build is the one that works here.
+pkg "pinentry"
+# Stands in for terminal-notifier: notify-send is what the HUD falls back to.
+pkg "libnotify"
+
+# languages and runtimes
+pkg "python"
+pkg "elixir"
+pkg "jdk-openjdk"
+pkg "maven"
+pkg "fnm"
+pkg "pnpm"
+pkg "yarn"
+pkg "nuget"
+aur "asdf-vm"
+
+# build / native deps
+pkg "cmake"
+pkg "cairo"
+pkg "glib2"
+pkg "harfbuzz"
+pkg "postgresql-libs"
+
+# cloud and infra
+pkg "aws-cli"
+pkg "terraform"
+pkg "helm"
+pkg "k9s"
+pkg "minikube"
+pkg "mariadb"
+aur "ngrok"
+
+# fromis_9-hud, Linux backend (GTK4 layer-shell overlay)
+pkg "gtk4"
+pkg "gtk4-layer-shell"
+pkg "python-gobject"
+
+# No Arch counterpart, and none needed:
+#   amethyst        — tiling is the compositor's job here (Hyprland)
+#   cocoapods       — iOS only
+#   watchman + folly/fizz/wangle/fbthrift/fb303/mvfst — watchman's macOS build deps;
+#                     `aur/watchman` builds them itself if you actually need it
+#   anaconda        — install from upstream, not a system package

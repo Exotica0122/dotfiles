@@ -5,14 +5,19 @@
 This repository contains my personal configuration files (dotfiles).
 They are organized so that I can easily manage them across multiple machines using [[https://www.gnu.org/software/stow/][GNU Stow]].
 
+Everything here runs on both macOS and Linux. The shell, tmux and Claude Code
+packages branch on ~uname~ where they have to; the packages that genuinely do not
+apply to a platform are called out under [[*Per-platform notes][Per-platform notes]].
+
 ** Clone this repository into your home directory (or wherever you prefer):
 #+begin_src bash
-git clone git@github.com:Exotica0122/dotfiles.git ~/github.com/Exotica0122/dotfiles.git
-cd ~/github.com/Exotica0122/dotfiles.git
+git clone git@github.com:Exotica0122/dotfiles.git ~/github.com/Exotica0122/dotfiles
+cd ~/github.com/Exotica0122/dotfiles
 #+end_src
 
 ** Install GNU Stow (if not already installed):
 - macOS (Homebrew): ~brew install stow~
+- Arch: ~sudo pacman -S stow~
 - Linux (Debian/Ubuntu): ~sudo apt install stow~
 - Linux (Fedora): ~sudo dnf install stow~
 
@@ -26,10 +31,65 @@ find . -mindepth 1 -maxdepth 1 -type d ! -name ".git" -exec basename {} \; | xar
 
 This will create symlinks in your home directory that point to the files in this repository.
 
-*** Brew packages
-**** Pre-requisite
-Please install [[https://brew.sh/][brew]]
-**** Download dependencies
+Stow refuses a package outright when any one of its files already exists as a real
+file, and links nothing. Keep the local copy and link the rest with ~--ignore~:
+
+#+begin_src bash
+stow -Rv --no-folding --ignore='\.p10k\.zsh' --target=$HOME zsh
+#+end_src
+
+*** Packages
+**** macOS — Homebrew
+Pre-requisite: install [[https://brew.sh/][brew]].
 #+begin_src bash
 brew bundle --file=Brewfile
 #+end_src
+
+**** Arch — pacman + AUR
+~Pkgfile.arch~ is the same list in pacman terms, ~pkg~ for the official repos and
+~aur~ for the rest. It carries notes on the handful of Brewfile entries that have
+no Linux counterpart.
+#+begin_src bash
+sudo pacman -S --needed $(sed -n 's/^pkg "\(.*\)"$/\1/p' Pkgfile.arch)
+yay        -S --needed $(sed -n 's/^aur "\(.*\)"$/\1/p' Pkgfile.arch)
+#+end_src
+
+*** tmux plugins
+~tmux.conf~ drives its plugins with TPM, which is not a package on either platform:
+#+begin_src bash
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+#+end_src
+Then ~prefix + I~ inside tmux to install the rest.
+
+* Per-platform notes
+
+** ghostty
+The config lives at the XDG path, ~ghostty/.config/ghostty/config~, which Ghostty
+reads on macOS as well as Linux.
+
+Do *not* stow this package on an [[https://omarchy.org/][Omarchy]] machine: Omarchy ships its own
+~~/.config/ghostty/config~ wired to the live theme, and this one would replace it.
+
+** tmux
+~tmux-status~ reads load, memory and battery from ~sysctl~/~pmset~ on macOS and
+from ~/proc~ and ~/sys/class/power_supply~ on Linux. A machine with no system
+battery drops the battery segment rather than printing a permanent ~??~; a
+peripheral battery (a wireless mouse reports as a power supply too) is ignored
+via ~scope=Device~.
+
+The ~prefix + u~ URL picker opens through ~open-url~, which is ~xdg-open~ on Linux
+and ~open~ on macOS.
+
+** zsh
+~.zshenv~ and ~.zshrc~ branch on ~uname~ for Homebrew vs pacman paths, fnm and pnpm
+data directories, and the Homebrew-vs-~/usr/share~ locations of the zsh plugins.
+~caffeinate~ wrapping of ~claude~ is macOS-only.
+
+~.p10k.zsh~ is tracked but is the most machine-specific file here: it bakes in the
+font, the colour scheme and whether the terminal can draw box glyphs. Expect to
+keep a local copy per machine (see ~--ignore~ above) rather than sharing one.
+
+** claude
+~claude/.claude/statusline.sh~ is portable. The rest of the Claude Code setup —
+settings, hooks, skills, memory — lives in the private ~dotfile-agents~ repo, and
+the session HUD it points at lives in [[https://github.com/Exotica0122/fromis_9-hud][fromis_9-hud]].
