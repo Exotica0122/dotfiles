@@ -104,7 +104,7 @@ if _is_macos && [[ -x /Applications/love.app/Contents/MacOS/love ]]; then
 fi
 
 # opencode
-export PATH=/Users/peteran/.opencode/bin:$PATH
+export PATH="$HOME/.opencode/bin:$PATH"
 alias c="opencode"
 
 export PATH="$HOME/.local/bin:$PATH"

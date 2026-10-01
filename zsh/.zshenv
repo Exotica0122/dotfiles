@@ -44,7 +44,7 @@ if command -v brew &>/dev/null; then
   export GOROOT="$(brew --prefix golang 2>/dev/null)/libexec"
 fi
 [[ -z "$GOROOT" && -d "$HOME/.asdf/installs/golang" ]] && export GOROOT="$HOME/.asdf/installs/golang/$(ls "$HOME/.asdf/installs/golang" 2>/dev/null | tail -n1)/go"
-[[ -z "$GOROOT" && _is_linux && -d /usr/lib/go ]] && export GOROOT=/usr/lib/go
+[[ -z "$GOROOT" ]] && _is_linux && [[ -d /usr/lib/go ]] && export GOROOT=/usr/lib/go
 export PATH="$PATH:$GOPATH/bin"
 [[ -n "$GOROOT" ]] && export PATH="$PATH:$GOROOT/bin"
 
@@ -63,4 +63,5 @@ fi
 export PATH="$PNPM_HOME:$PATH"
 
 export PATH="$PATH:$HOME/.config/emacs/bin/doom"
-. "$HOME/.cargo/env"
+# rust (optional)
+[[ -f "$HOME/.cargo/env" ]] && . "$HOME/.cargo/env"
