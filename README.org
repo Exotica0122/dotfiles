@@ -54,12 +54,29 @@ sudo pacman -S --needed $(sed -n 's/^pkg "\(.*\)"$/\1/p' Pkgfile.arch)
 yay        -S --needed $(sed -n 's/^aur "\(.*\)"$/\1/p' Pkgfile.arch)
 #+end_src
 
-*** tmux plugins
-~tmux.conf~ drives its plugins with TPM, which is not a package on either platform:
+*** Plugins
+Neither plugin manager installs itself, and *neither installs anything until you tell
+it to* — stowing the configs is not enough. Until this runs, ~ctrl+h/j/k/l~ does not
+move between panes, because that binding comes from ~vim-tmux-navigator~ on both sides.
+
+tmux, via TPM:
 #+begin_src bash
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+~/.tmux/plugins/tpm/bin/install_plugins     # or prefix + I inside tmux
+tmux source-file ~/.tmux.conf               # pick up the new bindings now
 #+end_src
-Then ~prefix + I~ inside tmux to install the rest.
+
+Neovim, via lazy.nvim — it installs on first launch, but only for the specs it can
+see, so run it again after adding one:
+#+begin_src bash
+nvim --headless "+Lazy! install" +qa        # or +Lazy! restore to match lazy-lock.json
+#+end_src
+
+Check both sides agree:
+#+begin_src bash
+ls ~/.tmux/plugins                          # expect 6, tpm included
+tmux list-keys -T root | grep -c '^bind-key -T root C-[hjkl] '   # expect 4
+#+end_src
 
 * Per-platform notes
 
