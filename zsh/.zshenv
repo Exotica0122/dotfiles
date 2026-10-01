@@ -62,6 +62,6 @@ else
 fi
 export PATH="$PNPM_HOME:$PATH"
 
-export PATH="$PATH:$HOME/.config/emacs/bin/doom"
+export PATH="$PATH:$HOME/.config/emacs/bin"
 # rust (optional)
 [[ -f "$HOME/.cargo/env" ]] && . "$HOME/.cargo/env"
