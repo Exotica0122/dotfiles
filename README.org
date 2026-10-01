@@ -87,6 +87,50 @@ reads on macOS as well as Linux.
 Do *not* stow this package on an [[https://omarchy.org/][Omarchy]] machine: Omarchy ships its own
 ~~/.config/ghostty/config~ wired to the live theme, and this one would replace it.
 
+** hypr, waybar, swayosd — Omarchy only
+These three packages only apply to an [[https://omarchy.org/][Omarchy]] machine. Do *not* stow them on macOS,
+and expect Omarchy to own the paths alongside them.
+
+Only the hand-authored files are tracked. ~autostart.conf~, ~hyprsunset.conf~ and
+~xdph.conf~ are byte-identical to Omarchy's defaults, so they are left for Omarchy
+to create; ~walker/config.toml~ and ~fontconfig/fonts.conf~ likewise.
+~mako/config~ is deliberately absent — it is a symlink into
+~~/.config/omarchy/current/theme/~ and must stay one.
+
+Omarchy creates every one of these files on install, and stow refuses a package
+when a target already exists, so remove the local copy before the first stow on a
+new machine:
+#+begin_src bash
+rm ~/.config/hypr/{bindings,envs,hypridle,hyprland,hyprlock,input,looknfeel,monitors}.conf
+rm ~/.config/waybar/{config.jsonc,style.css} ~/.config/swayosd/{config.toml,style.css}
+stow -Rv --no-folding --target=$HOME hypr waybar swayosd
+#+end_src
+
+Two things write *through* the symlinks, straight into this repo — which is mostly
+what you want, since the change then shows up in ~git diff~:
+- ~omarchy refresh <app>~ and update migrations ~cp~ their defaults over these paths.
+  A migration will happily reset ~hypridle.conf~ timeouts this way.
+- ~omarchy theme set~ rewrites the theme files it owns, which these only ~@import~.
+
+One thing *breaks* the symlinks: ~omarchy font set~ runs plain ~sed -i~ (no
+~--follow-symlinks~) against ~hyprlock.conf~, ~waybar/style.css~ and
+~swayosd/style.css~, which replaces each symlink with a regular file and leaves the
+repo copy on the old font. Re-stow after changing the font:
+#+begin_src bash
+omarchy font set "CaskaydiaMono Nerd Font"
+stow -Rv --no-folding --target=$HOME hypr waybar swayosd   # re-link what sed detached
+#+end_src
+
+~hypr/.config/hypr/envs.conf~ is the machine-specific file here: it carries the
+NVIDIA variables for a Turing+ card (an RTX 3060), and Omarchy's installer appends
+its own per-GPU block to that path. On a machine with different graphics, let
+Omarchy write it and skip ours (see ~--ignore~ above). Note also that nothing in
+Omarchy sources this file on its own — ~hyprland.conf~ has an explicit
+~source = ~/.config/hypr/envs.conf~ line for it.
+
+The desktop stack itself — hyprland, waybar, walker, mako, swayosd — is absent from
+~Pkgfile.arch~ on purpose: Omarchy's own base install provides it.
+
 ** tmux
 ~tmux-status~ reads load, memory and battery from ~sysctl~/~pmset~ on macOS and
 from ~/proc~ and ~/sys/class/power_supply~ on Linux. A machine with no system
