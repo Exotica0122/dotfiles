@@ -141,6 +141,12 @@ via ~scope=Device~.
 The ~prefix + u~ URL picker opens through ~open-url~, which is ~xdg-open~ on Linux
 and ~open~ on macOS.
 
+On [[https://omarchy.org/][Omarchy]], move its ~~/.config/tmux/tmux.conf~ aside. tmux loads it after
+~~/.tmux.conf~, and TPM reads only that file for ~@plugin~ lines, so no plugin loads:
+#+begin_src bash
+mv ~/.config/tmux/tmux.conf ~/.config/tmux/tmux.conf.omarchy.bak
+#+end_src
+
 ** zsh
 ~.zshenv~ and ~.zshrc~ branch on ~uname~ for Homebrew vs pacman paths, fnm and pnpm
 data directories, and the Homebrew-vs-~/usr/share~ locations of the zsh plugins.
