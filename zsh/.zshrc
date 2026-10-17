@@ -113,3 +113,8 @@ export PATH="$HOME/.local/bin:$PATH"
 if _is_macos; then
   claude() { caffeinate -ims command claude "$@"; }
 fi
+
+# Unity CLI
+. "/Users/peteran/.unity/env"
+export PATH="$PATH:/Applications/Docker.app/Contents/Resources/bin"
+export PATH="$PATH:/Applications/Docker.app/Contents/Resources/bin"
