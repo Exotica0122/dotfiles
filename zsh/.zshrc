@@ -115,6 +115,9 @@ if _is_macos; then
 fi
 
 # Unity CLI
-. "/Users/peteran/.unity/env"
-export PATH="$PATH:/Applications/Docker.app/Contents/Resources/bin"
-export PATH="$PATH:/Applications/Docker.app/Contents/Resources/bin"
+[[ -f "$HOME/.unity/env" ]] && . "$HOME/.unity/env"
+
+# Docker Desktop CLI
+if _is_macos && [[ -d /Applications/Docker.app/Contents/Resources/bin ]]; then
+  export PATH="$PATH:/Applications/Docker.app/Contents/Resources/bin"
+fi
